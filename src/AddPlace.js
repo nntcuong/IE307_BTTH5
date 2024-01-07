@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, TextInput, Button, Image, TouchableOpacity } from 'react-native';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useRef } from 'react';
 import * as ImagePicker from 'expo-image-picker';
 // Remove the following line if useNavigation is not used
 import { useNavigation } from '@react-navigation/native';
@@ -10,6 +10,17 @@ import * as Location from 'expo-location';
 import { Alert } from 'react-native';
 import * as SQLite from 'expo-sqlite';
 const db = SQLite.openDatabase('place.db');
+//import { Notifications } from 'expo';
+import * as Permissions from 'expo-permissions';
+import * as Device from 'expo-device';
+import * as Notifications from 'expo-notifications';
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
 export default function AddPlace({ route, navigation }) {
 
   const [title, setTitle] = useState('');
@@ -17,20 +28,38 @@ export default function AddPlace({ route, navigation }) {
   const [locationImage, setLocationImage] = useState(null);
   const [image, setImage] = useState(null);
   // const  [latitude,setLatitude]=useState('');
-//   const [latitude, setLatitude] = useState(null);
-// const [longitude, setLongitude] = useState(null);
-//const { latitude, longitude } = route.params;
-// if (route.params === null) {
-//   setLatitude(null);
-//   setLongitude(null);
-// } 
-// else {
-//   const { latitude: newLatitude, longitude: newLongitude } = route.params;
-//   setLatitude(newLatitude);
-//   setLongitude(newLongitude);
-// }
+  //   const [latitude, setLatitude] = useState(null);
+  // const [longitude, setLongitude] = useState(null);
+  //const { latitude, longitude } = route.params;
+  // if (route.params === null) {
+  //   setLatitude(null);
+  //   setLongitude(null);
+  // } 
+  // else {
+  //   const { latitude: newLatitude, longitude: newLongitude } = route.params;
+  //   setLatitude(newLatitude);
+  //   setLongitude(newLongitude);
+  // }
+  const [expoPushToken, setExpoPushToken] = useState('');
+  const [notification, setNotification] = useState(false);
+  const notificationListener = useRef();
+  const responseListener = useRef();
+  useEffect(() => {
+    registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
 
+    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+      setNotification(notification);
+    });
 
+    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+      console.log(response);
+    });
+
+    return () => {
+      Notifications.removeNotificationSubscription(notificationListener.current);
+      Notifications.removeNotificationSubscription(responseListener.current);
+    };
+  }, []);
 
 
   const handleTextInputChange = (text) => {
@@ -157,79 +186,144 @@ export default function AddPlace({ route, navigation }) {
   // const customLatitude = 16.462126;
   // const customLongitude = 107.592976;
   const { latitude = 0, longitude = 0 } = route.params || {};
-const customLatitude = latitude;
-const customLongitude = longitude;
-const getCustomLocation = async (customLatitude, customLongitude) => {
-  navigation.navigate('Map');
+  const customLatitude = latitude;
+  const customLongitude = longitude;
+  const getCustomLocation = async (customLatitude, customLongitude) => {
+    navigation.navigate('Map');
 
-  try {
-    if (typeof customLatitude === 'number' && typeof customLongitude === 'number') {
-      const latitude = customLatitude;
-      const longitude = customLongitude;
+    try {
+      if (typeof customLatitude === 'number' && typeof customLongitude === 'number') {
+        const latitude = customLatitude;
+        const longitude = customLongitude;
 
-      setRegion({
-        latitude: latitude,
-        longitude: longitude,
-        latitudeDelta: 0.0922,
-        longitudeDelta: 0.0421,
-      });
+        setRegion({
+          latitude: latitude,
+          longitude: longitude,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
+        });
 
-      const address = await Location.reverseGeocodeAsync({
-        latitude,
-        longitude,
-      });
+        const address = await Location.reverseGeocodeAsync({
+          latitude,
+          longitude,
+        });
 
-      const newFormattedAddress = address
-        .map(
-          (address) =>
-            `${address.streetNumber} ${address.street}, ${address.city}, ${address.region}, ${address.country}`
-        )
-        .join(', ');
+        const newFormattedAddress = address
+          .map(
+            (address) =>
+              `${address.streetNumber} ${address.street}, ${address.city}, ${address.region}, ${address.country}`
+          )
+          .join(', ');
 
-      setFormattedAddress(newFormattedAddress);
-      console.log('Custom Location Address:', newFormattedAddress);
-    } else {
-      console.error('Invalid latitude or longitude values');
+        setFormattedAddress(newFormattedAddress);
+        console.log('Custom Location Address:', newFormattedAddress);
+      } else {
+        console.error('Invalid latitude or longitude values');
+      }
+    } catch (error) {
+      console.error('Error getting custom location:', error);
     }
-  } catch (error) {
-    console.error('Error getting custom location:', error);
-  }
-};
+  };
 
+  // Notifications.setNotificationHandler({
+  //   handleNotification: async () => ({
+  //     shouldShowAlert: true,
+  //     shouldPlaySound: false,
+  //     shouldSetBadge: false,
+  //   }),
+  // });
 
+  // // Second, call the method
+
+  // Notifications.scheduleNotificationAsync({
+  //   content: {
+  //     title: 'Look at that notification',
+  //     body: "I'm so proud of myself!",
+  //   },
+  //   trigger: null,
+  // });
   const addPlace = () => {
     const newPlace = {
       title: title,
       formattedAddress: formattedAddress,
     };
+    if (customLatitude != 0 && customLongitude != 0) {
+      db.transaction(
+        (tx) => {
+          tx.executeSql(
+            'INSERT INTO place (title, image, formattedAddress, latitude, longitude) VALUES (?, ?, ?, ?, ?)',
+            [title, image, formattedAddress, customLatitude, customLongitude],
+            (_, { insertId }) => {
+              console.log('Place saved with ID:', insertId);
+              console.log('Current Address:', formattedAddress);
+              schedulePushNotification()
+              // Notifications.setNotificationHandler({
+              //   handleNotification: async () => ({
+              //     shouldShowAlert: true,
+              //     shouldPlaySound: false,
+              //     shouldSetBadge: false,
+              //   }),
+              // });
 
-    db.transaction(
-      (tx) => {
-        tx.executeSql(
-          'INSERT INTO place (title, image, formattedAddress, latitude, longitude) VALUES (?, ?, ?, ?, ?)',
-          [title, image, formattedAddress, customLatitude, customLongitude],
-          (_, { insertId }) => {
-            console.log('Place saved with ID:', insertId);
-            console.log('Current Address:', formattedAddress);
+              // // Second, call the method
 
-            Alert.alert('Success', 'Đã thêm địa điểm thành công!', [
-              {
-                text: 'OK',
-                onPress: () => {
-                  console.log('OK Pressed');
-                  navigation.navigate('My Places');
-                },
-              },
-            ]);
-          },
-          (error) => {
-            console.error('Error saving place:', error);
-          }
-        );
-      },
-      null,
-      null
-    );
+              // Notifications.scheduleNotificationAsync({
+              //   content: {
+              //     title: 'Look at that notification',
+              //     body: "I'm so proud of myself!",
+              //   },
+              //   trigger: null,
+              // });
+              navigation.goBack();
+            },
+            (error) => {
+              console.error('Error saving place:', error);
+            }
+          );
+        },
+        null,
+        null
+      );
+    }
+    if (region != null) {
+      db.transaction(
+        (tx) => {
+          tx.executeSql(
+            'INSERT INTO place (title, image, formattedAddress, latitude, longitude) VALUES (?, ?, ?, ?, ?)',
+            [title, image, formattedAddress, region.latitude, region.longitude],
+            (_, { insertId }) => {
+              console.log('Place saved with ID:', insertId);
+              console.log('Current Address:', formattedAddress);
+              schedulePushNotification()
+              // Notifications.setNotificationHandler({
+              //   handleNotification: async () => ({
+              //     shouldShowAlert: true,
+              //     shouldPlaySound: false,
+              //     shouldSetBadge: false,
+              //   }),
+              // });
+
+              // // Second, call the method
+
+              // Notifications.scheduleNotificationAsync({
+              //   content: {
+              //     title: 'Look at that notification',
+              //     body: "I'm so proud of myself!",
+              //   },
+              //   trigger: null,
+              // });
+              navigation.goBack();
+            },
+            (error) => {
+              console.error('Error saving place:', error);
+            }
+          );
+        },
+        null,
+        null
+      );
+    }
+
   };
   return (
     <View style={styles.container}>
@@ -298,7 +392,7 @@ const getCustomLocation = async (customLatitude, customLongitude) => {
         </View>
         <View style={{ flex: 0.2, marginTop: 70, flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 15, marginTop: 10, }}>
           <TouchableOpacity onPress={getCurrentLocation}>
-          {/* <TouchableOpacity> */}
+            {/* <TouchableOpacity> */}
             <View style={styles.greenBorder}>
 
               <Image source={require('../assets/map.png')} style={styles.image2}>
@@ -323,16 +417,62 @@ const getCustomLocation = async (customLatitude, customLongitude) => {
 
 
       <View style={{ flex: 0.1, marginTop: 20 }}>
-        <Button title="Add Place" onPress={addPlace}>
-
-        </Button>
+        <Button title="Add Place" onPress={addPlace}></Button>
+        <Button
+        title="Press to schedule a notification"
+        onPress={async () => {
+          await schedulePushNotification();
+        }}
+      />
       </View>
 
 
     </View>
   );
 }
+async function schedulePushNotification() {
+  await Notifications.scheduleNotificationAsync({
+    content: {
+      title: "You've got mail! 📬",
+      body: 'Here is the notification body',
+      data: { data: 'goes here' },
+    },
+    trigger: { seconds: 2 },
+  });
+}
+async function registerForPushNotificationsAsync() {
+  let token;
 
+  if (Platform.OS === 'android') {
+    await Notifications.setNotificationChannelAsync('default', {
+      name: 'default',
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: '#FF231F7C',
+    });
+  }
+
+  if (Device.isDevice) {
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    if (existingStatus !== 'granted') {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+    if (finalStatus !== 'granted') {
+      alert('Failed to get push token for push notification!');
+      return;
+    }
+    // Learn more about projectId:
+    // https://docs.expo.dev/push-notifications/push-notifications-setup/#configure-projectid
+    token = (await Notifications.getExpoPushTokenAsync({ projectId: 'your-project-id' })).data;
+    console.log(token);
+  } else {
+    alert('Must use physical device for Push Notifications');
+  }
+
+  return token;
+}
 const styles = StyleSheet.create({
   container: {
     flex: 1,

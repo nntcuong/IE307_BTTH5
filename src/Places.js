@@ -7,6 +7,8 @@ import AddPlace from './AddPlace';
 import MyPlaces from './MyPlaces';
 import { NavigationContainer } from '@react-navigation/native';
 import Map from './Map';
+import Info from './Info';
+import MapInfo from './MapInfo';
 export default function Places({ navigation }) {
   return (
   
@@ -24,6 +26,8 @@ export default function Places({ navigation }) {
       />
       <Stack.Screen name="Add a new Place" component={AddPlace} />
       <Stack.Screen name="Map" component={Map} />
+      <Stack.Screen name="Info" component={Info} />
+      <Stack.Screen name="Map Info" component={MapInfo} />
     </Stack.Navigator>
     
   );

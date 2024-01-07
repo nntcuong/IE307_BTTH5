@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { View, Text, Image, FlatList, StyleSheet } from 'react-native';
+import { View, Text, Image, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import * as SQLite from 'expo-sqlite';
 
 const db = SQLite.openDatabase('place.db');
 
-export default function MyPlaces() {
+export default function MyPlaces({ route, navigation }) {
   const [place, setPlaces] = useState([]);
 
   useEffect(() => {
@@ -38,6 +38,7 @@ export default function MyPlaces() {
           data={place}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
+            <TouchableOpacity onPress={() => navigation.navigate('Info',  { note: item })}>
             <View style={{ flexDirection: 'row',marginTop:15,backgroundColor:'white' }}>
               <Image source={{ uri: item.image }} style={styles.image} />
               {/* <Text>{item.image}</Text> */}
@@ -48,6 +49,7 @@ export default function MyPlaces() {
                 <Text style={{ marginRight:40 }}>{item.longitude}</Text>
               </View>
             </View>
+            </TouchableOpacity>
           )}
         />
       ) : (
