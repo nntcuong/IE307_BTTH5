@@ -7,6 +7,8 @@ import Places from './Places';
 import AddPlace from './AddPlace';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import MyPlaces from './MyPlaces';
+import Record from './Record';
+import MyGallery from './MyGallery';
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 const Main = ({ navigation }) => {
@@ -20,7 +22,7 @@ const Main = ({ navigation }) => {
               iconName = focused
                 ? require('../assets/place.png')
                 : require('../assets/place.png');
-            } else if (route.name === 'My Gallery') {
+            } else if (route.name === 'Media') {
               iconName = focused
                 ? require('../assets/gallery.png')
                 : require('../assets/gallery.png');
@@ -35,7 +37,8 @@ const Main = ({ navigation }) => {
         })}
       >
         <Tab.Screen name="Places"component={Places} options={{ headerShown: false }} />
-        <Tab.Screen name="My Gallery" component={Media} />
+        <Tab.Screen name="Media" component={MyGallery} options={{ headerShown: false }}/>
+       
       </Tab.Navigator>
 
     </NavigationContainer>
