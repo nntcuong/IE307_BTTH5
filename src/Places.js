@@ -9,6 +9,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import Map from './Map';
 import Info from './Info';
 import MapInfo from './MapInfo';
+//Nguyễn Ngô Thế Cường :21521905
 export default function Places({ navigation }) {
   return (
   
@@ -32,7 +33,7 @@ export default function Places({ navigation }) {
     
   );
 }
-
+//Nguyễn Ngô Thế Cường :21521905
 const styles = StyleSheet.create({
   container: {
     flex: 1,

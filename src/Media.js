@@ -1,36 +1,35 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, Image, TouchableOpacity,FlatList } from 'react-native';
 import React, { useContext,useState, useRef,useEffect } from 'react';
-//import { MediaLibrary } from 'expo-media-library';
+
 import * as MediaLibrary from 'expo-media-library';
 import { Video } from 'expo-av';
 export default function Media({navigation}) {
   const [media, setMedia] = useState([]);
-  const [numColumns, setNumColumns] = useState(2);
-  
+ //Nguyễn Ngô Thế Cường :21521905
   useEffect(() => {
     (async () => {
-      await getMediaAssets();
+      const { status } = await MediaLibrary.requestPermissionsAsync();
+      
+      if (status === 'granted') {
+        const mediaAssets = await MediaLibrary.getAssetsAsync({ first: 10, mediaType: ['photo', 'video'] });
+        setMedia(mediaAssets.assets);
+      }
     })();
   }, []);
-
-  const getMediaAssets = async () => {
-    const { status } = await MediaLibrary.requestPermissionsAsync();
-    if (status === 'granted') {
-      const mediaAssets = await MediaLibrary.getAssetsAsync();
-      setMedia(mediaAssets.assets);
-    }
+  const renderItem = ({ item }) => {
+    return (
+      <TouchableOpacity>
+        {item.mediaType === 'photo' ? (
+          <Image source={{ uri: item.uri }} style={{ width: 180, height: 200, margin: 5 }} />
+        ) : (
+          // You can customize the video thumbnail or use a placeholder image.
+          <Image source={{ uri: 'https://example.com/placeholder-video-thumbnail.jpg' }} style={{ width: 150, height: 150, margin: 5 }} />
+        )}
+      </TouchableOpacity>
+    );
   };
-  const handlePress = async () => {
-    // Perform the logic for taking a photo here
-    // ...
-
-    // After taking the photo, refresh the media list
-    await getMediaAssets();
-  };
-  const toggleNumColumns = () => {
-    setNumColumns((prevNumColumns) => (prevNumColumns === 2 ? 1 : 2));
-  };
+  //Nguyễn Ngô Thế Cường :21521905
   return (
     <View style={styles.container}>
       <View style={{ flex: 0.08, backgroundColor: 'white', flexDirection: 'row', marginTop: 20, justifyContent: 'space-between' }}>
@@ -40,35 +39,18 @@ export default function Media({navigation}) {
         </Image>
         </TouchableOpacity>
       </View>
-      <View style={{flex:0.92}}>
+      <View style={{flex:0.92,alignItems:'center'}}>
       <FlatList
         data={media}
+        renderItem={renderItem}
         keyExtractor={(item) => item.id}
-        numColumns={numColumns}
-        renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => handlePress(item)}>
-            {item.mediaType === 'video' ? (
-              <Video
-              source={{ uri: item.uri }}
-              style={{ width: 100, height: 100 }}
-              resizeMode="cover"
-              useNativeControls
-            />
-              
-            ) : (
-              <Image
-                source={{ uri: item.uri }}
-                style={{ width: 180, height: 135,marginTop:10,alignContent:'center' }}
-              />
-            )}
-          </TouchableOpacity>
-        )}
+        numColumns={2}
       />
       </View>
     </View>
   );
 }
-
+//Nguyễn Ngô Thế Cường :21521905
 const styles = StyleSheet.create({
   container: {
     flex: 1,

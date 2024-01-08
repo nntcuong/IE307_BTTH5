@@ -11,6 +11,7 @@ import Record from './Record';
 import MyGallery from './MyGallery';
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
+ //Nguyễn Ngô Thế Cường :21521905
 const Main = ({ navigation }) => {
   return (
     <NavigationContainer>
@@ -44,7 +45,7 @@ const Main = ({ navigation }) => {
     </NavigationContainer>
   );
 };
-
+ //Nguyễn Ngô Thế Cường :21521905
 const styles = StyleSheet.create({
   container: {
     flex: 1,

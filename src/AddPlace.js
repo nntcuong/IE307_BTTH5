@@ -1,17 +1,11 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TextInput, Button, Image, TouchableOpacity } from 'react-native';
+
+import { StyleSheet, Text, View, TextInput, Button, Image, TouchableOpacity,Alert } from 'react-native';
 import React, { useState, useEffect,useRef } from 'react';
 import * as ImagePicker from 'expo-image-picker';
-// Remove the following line if useNavigation is not used
-import { useNavigation } from '@react-navigation/native';
-
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
-import { Alert } from 'react-native';
 import * as SQLite from 'expo-sqlite';
 const db = SQLite.openDatabase('place.db');
-//import { Notifications } from 'expo';
-import * as Permissions from 'expo-permissions';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 Notifications.setNotificationHandler({
@@ -21,25 +15,13 @@ Notifications.setNotificationHandler({
     shouldSetBadge: false,
   }),
 });
+//Nguyễn Ngô Thế Cương :21521905
 export default function AddPlace({ route, navigation }) {
 
   const [title, setTitle] = useState('');
   const [locationName, setLocationName] = useState('');
   const [locationImage, setLocationImage] = useState(null);
   const [image, setImage] = useState(null);
-  // const  [latitude,setLatitude]=useState('');
-  //   const [latitude, setLatitude] = useState(null);
-  // const [longitude, setLongitude] = useState(null);
-  //const { latitude, longitude } = route.params;
-  // if (route.params === null) {
-  //   setLatitude(null);
-  //   setLongitude(null);
-  // } 
-  // else {
-  //   const { latitude: newLatitude, longitude: newLongitude } = route.params;
-  //   setLatitude(newLatitude);
-  //   setLongitude(newLongitude);
-  // }
   const [expoPushToken, setExpoPushToken] = useState('');
   const [notification, setNotification] = useState(false);
   const notificationListener = useRef();
@@ -61,7 +43,7 @@ export default function AddPlace({ route, navigation }) {
     };
   }, []);
 
-
+//Nguyễn Ngô Thế Cường :21521905
   const handleTextInputChange = (text) => {
     setTitle(text);
   };
@@ -99,7 +81,7 @@ export default function AddPlace({ route, navigation }) {
       aspect: [4, 3],
       quality: 1,
     });
-
+//Nguyễn Ngô Thế Cường :21521905
     if (!result.cancelled) {
       console.log("URI of the taken image:", result.uri);
       setImage(result.uri);
@@ -118,7 +100,7 @@ export default function AddPlace({ route, navigation }) {
     (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
-        // Handle permission not granted
+   
       } else {
         const location = await Location.getCurrentPositionAsync({});
         setCurrentLocation(location.coords);
@@ -132,25 +114,21 @@ export default function AddPlace({ route, navigation }) {
   };
   const [region, setRegion] = useState(null);
 
-  // useEffect(() => {
-
-  //   getCurrentLocation();
-  // }, []);
   const [formattedAddress, setFormattedAddress] = useState('');
   const getCurrentLocation = async () => {
     try {
       const { status } = await Location.requestForegroundPermissionsAsync();
-
+//Nguyễn Ngô Thế Cường :21521905
       if (status === 'granted') {
         const location = await Location.getCurrentPositionAsync({});
         const { latitude, longitude } = location.coords;
 
         setRegion({
           //...region,
-          latitude: latitude, // Update latitude
+          latitude: latitude, 
           longitude: longitude,
           latitudeDelta: 0.0922,
-          longitudeDelta: 0.0421, // Update longitude
+          longitudeDelta: 0.0421,
         });
 
         const address = await Location.reverseGeocodeAsync({
@@ -174,17 +152,7 @@ export default function AddPlace({ route, navigation }) {
       console.error('Error getting location:', error);
     }
   };
-  // useEffect(() => {
-  //   if (route.params && route.params.customLatitude && route.params.customLongitude) {
-  //     // Set the values of customLatitude and customLongitude
-  //     const { customLatitude, customLongitude } = route.params;
-  //     // Use these values as needed in your component
-  //     // For example, you might want to call getCustomLocation with these values
-  //     getCustomLocation(customLatitude, customLongitude);
-  //   }
-  // }, [route.params]);
-  // const customLatitude = 16.462126;
-  // const customLongitude = 107.592976;
+  //Nguyễn Ngô Thế Cường :21521905
   const { latitude = 0, longitude = 0 } = route.params || {};
   const customLatitude = latitude;
   const customLongitude = longitude;
@@ -220,28 +188,12 @@ export default function AddPlace({ route, navigation }) {
       } else {
         console.error('Invalid latitude or longitude values');
       }
+      //Nguyễn Ngô Thế Cường :21521905
     } catch (error) {
       console.error('Error getting custom location:', error);
     }
   };
 
-  // Notifications.setNotificationHandler({
-  //   handleNotification: async () => ({
-  //     shouldShowAlert: true,
-  //     shouldPlaySound: false,
-  //     shouldSetBadge: false,
-  //   }),
-  // });
-
-  // // Second, call the method
-
-  // Notifications.scheduleNotificationAsync({
-  //   content: {
-  //     title: 'Look at that notification',
-  //     body: "I'm so proud of myself!",
-  //   },
-  //   trigger: null,
-  // });
   const addPlace = () => {
     const newPlace = {
       title: title,
@@ -259,7 +211,7 @@ export default function AddPlace({ route, navigation }) {
               console.log('Current Address:', formattedAddress);
               schedulePushNotification()
               navigation.navigate('My Places');
-              
+              Alert.alert('Places added successfully', 'The place has been added to your favorites library!!');
             },
             (error) => {
               console.error('Error saving place:', error);
@@ -270,6 +222,7 @@ export default function AddPlace({ route, navigation }) {
         null
       );
     }
+    //Nguyễn Ngô Thế Cường :21521905
     if (region != null) {
       db.transaction(
         (tx) => {
@@ -280,6 +233,7 @@ export default function AddPlace({ route, navigation }) {
               console.log('Place saved with ID:', insertId);
               console.log('Current Address:', formattedAddress);
               schedulePushNotification()
+              Alert.alert('Places added successfully', 'The place has been added to your favorites library!!');
               navigation.navigate('My Places');
             },
             (error) => {
@@ -294,13 +248,13 @@ export default function AddPlace({ route, navigation }) {
 
 
   };
+  //Nguyễn Ngô Thế Cường :21521905
   return (
     <View style={styles.container}>
       <View style={{ flex: 0.1 }}>
         <Text style={{ fontSize: 16, fontWeight: 'bold' }}>
           Title
-          {/* //    <Text>Latitude: {latitude}</Text>
-      <Text>Longitude: {longitude}</Text> */}
+    
         </Text>
         <TextInput
           style={styles.input}
@@ -329,7 +283,7 @@ export default function AddPlace({ route, navigation }) {
               <Text style={styles.text}>Pick Image</Text>
             </View>
           </TouchableOpacity>
-
+          {/* //Nguyễn Ngô Thế Cường :21521905 */}
           <TouchableOpacity onPress={takeImage}>
             <View style={styles.greenBorder}>
 
@@ -359,9 +313,10 @@ export default function AddPlace({ route, navigation }) {
             </View>
           )}
         </View>
+        {/* //Nguyễn Ngô Thế Cường :21521905 */}
         <View style={{ flex: 0.2, marginTop: 70, flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 15, marginTop: 10, }}>
           <TouchableOpacity onPress={getCurrentLocation}>
-            {/* <TouchableOpacity> */}
+          
             <View style={styles.greenBorder}>
 
               <Image source={require('../assets/map.png')} style={styles.image2}>
@@ -370,7 +325,7 @@ export default function AddPlace({ route, navigation }) {
               <Text style={styles.text}>Locate User</Text>
             </View>
           </TouchableOpacity>
-          {/* <TouchableOpacity onPress={() => navigation.navigate('Map')}> */}
+        
           <TouchableOpacity onPress={() => getCustomLocation(customLatitude, customLongitude)}>
             <View style={styles.greenBorder}>
 
@@ -384,15 +339,10 @@ export default function AddPlace({ route, navigation }) {
 
       </View>
 
-
+      {/* //Nguyễn Ngô Thế Cường :21521905 */}
       <View style={{ flex: 0.1, marginTop: 20 }}>
         <Button title="Add Place" onPress={addPlace}></Button>
-        {/* <Button
-        title="Press to schedule a notification"
-        onPress={async () => {
-          await schedulePushNotification();
-        }}
-      /> */}
+      
       </View>
 
 
@@ -409,6 +359,7 @@ async function schedulePushNotification() {
     trigger: { seconds: 2 },
   });
 }
+//Nguyễn Ngô Thế Cường :21521905
 async function registerForPushNotificationsAsync() {
   let token;
 
@@ -432,8 +383,7 @@ async function registerForPushNotificationsAsync() {
       alert('Failed to get push token for push notification!');
       return;
     }
-    // Learn more about projectId:
-    // https://docs.expo.dev/push-notifications/push-notifications-setup/#configure-projectid
+
     token = (await Notifications.getExpoPushTokenAsync({ projectId: 'your-project-id' })).data;
     console.log(token);
   } else {
@@ -442,6 +392,7 @@ async function registerForPushNotificationsAsync() {
 
   return token;
 }
+//Nguyễn Ngô Thế Cường :21521905
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -467,10 +418,11 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   image: {
-    width: 340,
-    height: 260,
+    width: 380,
+    height: 210,
     marginBottom: 20,
   },
+  //Nguyễn Ngô Thế Cường :21521905
   noImageContainer: {
     width: 380,
     height: 210,
@@ -502,6 +454,7 @@ const styles = StyleSheet.create({
     width: "98%", height: 180, alignSelf: 'center',
     backgroundColor: '#808080'
   },
+  //Nguyễn Ngô Thế Cường :21521905
   input: {
     height: 40,
     borderColor: 'gray',

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
-
+ //Nguyễn Ngô Thế Cường :21521905
 const MapInfo = ({ route, navigation }) => {
   const { note } = route.params;
 
@@ -28,7 +28,7 @@ const MapInfo = ({ route, navigation }) => {
     </View>
   );
 };
-
+ //Nguyễn Ngô Thế Cường :21521905
 const styles = StyleSheet.create({
   container: {
     flex: 1,

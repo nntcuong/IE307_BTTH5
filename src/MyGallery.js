@@ -5,6 +5,7 @@ import { Recording } from 'expo-av/build/Audio';
 import Media from './Media';
 import Record from './Record';
 const Stack = createNativeStackNavigator();
+//Nguyễn Ngô Thế Cường :21521905
 const MyGallery = () => {
   return (
    

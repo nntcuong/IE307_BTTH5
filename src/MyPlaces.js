@@ -4,7 +4,7 @@ import { View, Text, Image, FlatList, StyleSheet, TouchableOpacity } from 'react
 import * as SQLite from 'expo-sqlite';
 
 const db = SQLite.openDatabase('place.db');
-
+//Nguyễn Ngô Thế Cường :21521905
 export default function MyPlaces({ route, navigation }) {
   const [place, setPlaces] = useState([]);
 
@@ -29,7 +29,7 @@ export default function MyPlaces({ route, navigation }) {
       null
     );
   }, []);
-
+//Nguyễn Ngô Thế Cường :21521905
   return (
     <View style={styles.container}>
       {place.length > 0 ? (
@@ -41,12 +41,11 @@ export default function MyPlaces({ route, navigation }) {
             <TouchableOpacity onPress={() => navigation.navigate('Info',  { note: item })}>
             <View style={{ flexDirection: 'row',marginTop:15,backgroundColor:'white' }}>
               <Image source={{ uri: item.image }} style={styles.image} />
-              {/* <Text>{item.image}</Text> */}
+            
               <View style={styles.item}>
                 <Text style={{ fontWeight: 'bold', fontSize: 18 }}>{item.title}</Text>
                 <Text style={{ marginRight:40 }}>{item.formattedAddress}</Text>
-                {/* <Text style={{ marginRight:40 }}>{item.latitude}</Text>
-                <Text style={{ marginRight:40 }}>{item.longitude}</Text> */}
+            
               </View>
             </View>
             </TouchableOpacity>
@@ -59,6 +58,7 @@ export default function MyPlaces({ route, navigation }) {
     </View>
   );
 }
+//Nguyễn Ngô Thế Cường :21521905
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -68,11 +68,11 @@ const styles = StyleSheet.create({
     marginHorizontal:10,
   },
   item: {
-    //borderBottomWidth: 1,
+
     padding: 10,
   },
   FlatList: {
-  //  backgroundColor: 'white',
+
     
   },
   image: {

@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'
 import React from 'react'
-
+ //Nguyễn Ngô Thế Cường :21521905
 const Info = ({ route, navigation }) => {
   //const route = useRoute();
   const { note } = route.params;
@@ -21,7 +21,7 @@ const Info = ({ route, navigation }) => {
     </View>
   )
 }
-
+ //Nguyễn Ngô Thế Cường :21521905
 const styles = StyleSheet.create({
   container: {
     flex: 1,

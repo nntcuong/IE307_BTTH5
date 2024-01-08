@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import Main from './src/Main';
 import React from 'react';
 import * as SQLite from 'expo-sqlite';
-
+//Nguyễn Ngô Thế Cường :21521905
 export default function App() {
   React.useEffect(() => {
     const db = SQLite.openDatabase('place.db');
