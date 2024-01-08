@@ -7,18 +7,18 @@ import * as SQLite from 'expo-sqlite';
 export default function App() {
   React.useEffect(() => {
     const db = SQLite.openDatabase('place.db');
-db.transaction(
-  (tx) => {
-    tx.executeSql(
-      'CREATE TABLE IF NOT EXISTS place (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, image TEXT, formattedAddress TEXT, latitude REAL, longitude REAL);'
+    db.transaction(
+      (tx) => {
+        tx.executeSql(
+          'CREATE TABLE IF NOT EXISTS place (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, image TEXT, formattedAddress TEXT, latitude REAL, longitude REAL);'
+        );
+      },
+      null,
+      null
     );
-  },
-  null,
-  null
-);
   }, []);
   return (
-    <Main/>
+    <Main />
   );
 }
 

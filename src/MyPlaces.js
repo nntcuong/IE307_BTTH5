@@ -8,27 +8,50 @@ const db = SQLite.openDatabase('place.db');
 export default function MyPlaces({ route, navigation }) {
   const [place, setPlaces] = useState([]);
 
-  useEffect(() => {
-    const db = SQLite.openDatabase('place.db');
+  const fetchData = () => {
+    try {
+      db.transaction(
+        (tx) => {
+          tx.executeSql(
+            'SELECT * FROM place;',
+            [],
+            (_, { rows }) => {
+              const data = rows['_array'];
+              setPlaces(data);
+            },
+            (error) => {
+              console.error('Error fetching places:', error);
+            }
+          );
+        },
+        
+        null,
+        null
+      );
+     
+    } catch (error) {
+      console.error('Error fetching places:', error);
+    }
+  };
 
-    db.transaction(
-      (tx) => {
-        tx.executeSql(
-          'SELECT * FROM place;',
-          [],
-          (_, { rows }) => {
-            const data = rows['_array'];
-            setPlaces(data);
-          },
-          (error) => {
-            console.error('Error fetching places:', error);
-          }
-        );
-      },
-      null,
-      null
-    );
+  useEffect(() => {
+    fetchData();
   }, []);
+
+  const deletePlaceInDatabase = (id) => {
+    try {
+      db.transaction(
+        (tx) => {
+          tx.executeSql('DELETE FROM place WHERE id = ?;', [id]);
+        },
+        null,
+        null
+      );
+      fetchData(); // Fetch updated data after deletion
+    } catch (error) {
+      console.error('Error deleting place:', error);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -38,17 +61,19 @@ export default function MyPlaces({ route, navigation }) {
           data={place}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
-            <TouchableOpacity onPress={() => navigation.navigate('Info',  { note: item })}>
-            <View style={{ flexDirection: 'row',marginTop:15,backgroundColor:'white' }}>
-              <Image source={{ uri: item.image }} style={styles.image} />
-              {/* <Text>{item.image}</Text> */}
-              <View style={styles.item}>
-                <Text style={{ fontWeight: 'bold', fontSize: 18 }}>{item.title}</Text>
-                <Text style={{ marginRight:40 }}>{item.formattedAddress}</Text>
-                <Text style={{ marginRight:40 }}>{item.latitude}</Text>
-                <Text style={{ marginRight:40 }}>{item.longitude}</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('Info', { note: item })}>
+              <View style={{ flexDirection: 'row', marginTop: 15, backgroundColor: 'white' }}>
+                <Image source={{ uri: item.image }} style={styles.image} />
+                <View style={styles.item}>
+                  <Text style={{ fontWeight: 'bold', fontSize: 18 }}>{item.title}</Text>
+                  <TouchableOpacity onPress={() => deletePlaceInDatabase(item.id)}>
+                    <Text style={{ color: 'red', fontSize: 18, marginLeft: 10 }}>X</Text>
+                  </TouchableOpacity>
+                  <Text style={{ marginRight: 40 }}>{item.formattedAddress}</Text>
+                  <Text style={{ marginRight: 40 }}>{item.latitude}</Text>
+                  <Text style={{ marginRight: 40 }}>{item.longitude}</Text>
+                </View>
               </View>
-            </View>
             </TouchableOpacity>
           )}
         />
@@ -59,25 +84,24 @@ export default function MyPlaces({ route, navigation }) {
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    marginHorizontal:10,
+    marginHorizontal: 10,
   },
   item: {
-    //borderBottomWidth: 1,
     padding: 10,
   },
   FlatList: {
-  //  backgroundColor: 'white',
-    
+    // backgroundColor: 'white',
   },
   image: {
     width: 80,
     height: 120,
-    justifyContent:'center',
-  }
+    justifyContent: 'center',
+  },
 });

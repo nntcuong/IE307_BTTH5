@@ -204,8 +204,8 @@ export default function AddPlace({ route, navigation }) {
         });
 
         const address = await Location.reverseGeocodeAsync({
-          latitude,
-          longitude,
+          latitude: latitude,
+          longitude: longitude,
         });
 
         const newFormattedAddress = address
@@ -418,12 +418,12 @@ export default function AddPlace({ route, navigation }) {
 
       <View style={{ flex: 0.1, marginTop: 20 }}>
         <Button title="Add Place" onPress={addPlace}></Button>
-        <Button
+        {/* <Button
         title="Press to schedule a notification"
         onPress={async () => {
           await schedulePushNotification();
         }}
-      />
+      /> */}
       </View>
 
 
