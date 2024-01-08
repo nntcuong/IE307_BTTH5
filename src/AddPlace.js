@@ -247,6 +247,7 @@ export default function AddPlace({ route, navigation }) {
       title: title,
       formattedAddress: formattedAddress,
     };
+  
     if (customLatitude != 0 && customLongitude != 0) {
       db.transaction(
         (tx) => {
@@ -257,24 +258,8 @@ export default function AddPlace({ route, navigation }) {
               console.log('Place saved with ID:', insertId);
               console.log('Current Address:', formattedAddress);
               schedulePushNotification()
-              // Notifications.setNotificationHandler({
-              //   handleNotification: async () => ({
-              //     shouldShowAlert: true,
-              //     shouldPlaySound: false,
-              //     shouldSetBadge: false,
-              //   }),
-              // });
-
-              // // Second, call the method
-
-              // Notifications.scheduleNotificationAsync({
-              //   content: {
-              //     title: 'Look at that notification',
-              //     body: "I'm so proud of myself!",
-              //   },
-              //   trigger: null,
-              // });
-              navigation.goBack();
+              navigation.navigate('My Places');
+              
             },
             (error) => {
               console.error('Error saving place:', error);
@@ -295,24 +280,7 @@ export default function AddPlace({ route, navigation }) {
               console.log('Place saved with ID:', insertId);
               console.log('Current Address:', formattedAddress);
               schedulePushNotification()
-              // Notifications.setNotificationHandler({
-              //   handleNotification: async () => ({
-              //     shouldShowAlert: true,
-              //     shouldPlaySound: false,
-              //     shouldSetBadge: false,
-              //   }),
-              // });
-
-              // // Second, call the method
-
-              // Notifications.scheduleNotificationAsync({
-              //   content: {
-              //     title: 'Look at that notification',
-              //     body: "I'm so proud of myself!",
-              //   },
-              //   trigger: null,
-              // });
-              navigation.goBack();
+              navigation.navigate('My Places');
             },
             (error) => {
               console.error('Error saving place:', error);
@@ -323,6 +291,7 @@ export default function AddPlace({ route, navigation }) {
         null
       );
     }
+
 
   };
   return (

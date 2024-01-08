@@ -94,9 +94,12 @@ export default function Record() {
         )}
 
         {record && (
-          <View style={{ alignItems: 'center' }}>
+          <View style={{ alignItems: 'center',flexDirection:'row',marginTop:5,alignSelf:'center'}}>
             <TouchableOpacity onPress={() => reRecord()} style={{width:120,height:40,backgroundColor:'red',borderRadius:10}}>
               <Text style={{alignSelf:'center',marginTop:5,fontSize:17,color:'white',fontWeight:'bold'}}>R-Record</Text>
+            </TouchableOpacity>
+            <TouchableOpacity  style={{width:80,height:40,backgroundColor:'blue',borderRadius:10}}>
+              <Text style={{alignSelf:'center',marginTop:5,fontSize:17,color:'white',fontWeight:'bold'}}>Save</Text>
             </TouchableOpacity>
           </View>
         )}
